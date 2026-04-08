@@ -1,0 +1,62 @@
+# 数组理论基础
+数组是存放在 连续内存空间 上的 相同类型 数据的集合
+## C+
+二维数组在物理内存地址中是连续的
+## Java
+1. 二维数组实际上是变量存着一维数组的引用值，一维数组存着对一行行数组的引用值。
+2. System.out.println(a[1]) 输出的是 toString() 结果
+3. Java看不到地址，二维数组中存对其他数组引用的一维数组中存的地址不是连续的
+# 二分查找
+## 题目
+给定一个 n 个元素有序的（升序）整型数组 nums 和一个目标值 target  ，写一个函数搜索 nums 中的 target，如果目标值存在返回下标，否则返回 -1。
+```txt
+示例一：
+输入: nums = [-1,0,3,5,9,12], target = 9     
+输出: 4       
+解释: 9 出现在 nums 中并且下标为 4 
+
+示例二：
+输入: nums = [-1,0,3,5,9,12], target = 2     
+输出: -1        
+解释: 2 不存在 nums 中因此返回 -1
+
+提示：
+你可以假设 nums 中的所有元素是不重复的。
+n 将在 [1, 10000]之间。
+nums 的每个元素都将在 [-9999, 9999]之间
+```
+## 思路
+1. 二分查找的前提：有序无重复
+## 解法
+```java
+class Solution {
+    //输入：有序无重复数组nums和目标值target
+    //输出：找到则输出数组下标，找不到输出-1
+    public int search(int[] nums, int target) {
+        // 检测边界值，避免当 target 小于nums[0] nums[nums.length - 1]时多次循环运算
+        if (target < nums[0] || target > nums[nums.length - 1]) {
+            return -1;
+        }
+        int left = 0, right = nums.length - 1;
+        //
+        while (left <= right) {
+            //两数中间值应为较小的数加上两数之差的一般
+            int mid = left + ((right - left) >> 1);
+            //第一种情况：相等直接返回索引
+            if (nums[mid] == target) {
+                return mid;
+            }
+            //第二种情况：target大于mid，动左边
+            else if (nums[mid] < target) {
+                left = mid + 1;
+            }
+            //第三种情况：target小于mid,动右边
+            else { // nums[mid] > target
+                right = mid - 1;
+            }
+        }
+        // 未找到目标值
+        return -1;
+    }
+}
+```
