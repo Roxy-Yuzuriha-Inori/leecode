@@ -1,4 +1,4 @@
-# 数组理论基础
+# 1.数组理论基础
 数组是存放在 连续内存空间 上的 相同类型 数据的集合
 ## C+
 二维数组在物理内存地址中是连续的
@@ -6,7 +6,7 @@
 1. 二维数组实际上是变量存着一维数组的引用值，一维数组存着对一行行数组的引用值。
 2. System.out.println(a[1]) 输出的是 toString() 结果
 3. Java看不到地址，二维数组中存对其他数组引用的一维数组中存的地址不是连续的
-# 二分查找
+# 2.二分查找
 ## 题目
 给定一个 n 个元素有序的（升序）整型数组 nums 和一个目标值 target  ，写一个函数搜索 nums 中的 target，如果目标值存在返回下标，否则返回 -1。
 ```txt
@@ -62,119 +62,124 @@ class Solution {
     }
 }
 ```
-# 移除元素
+# 3.移除元素
 ## 题目
 给你一个数组 nums 和一个值 val，你需要 原地 移除所有数值等于 val 的元素，并返回移除后数组的新长度。<br/>
 不要使用额外的数组空间，你必须仅使用 O(1) 额外空间并原地修改输入数组。<br/>
 元素的顺序可以改变。你不需要考虑数组中超出新长度后面的元素。
 ```txt
 示例 1: 给定 nums = [3,2,2,3], val = 3, 函数应该返回新的长度 2, 并且 nums 中的前两个元素均为 2。
-[0,1,2,2,3,0,4,2,1,5]
+
 示例 2: 给定 nums = [0,1,2,2,3,0,4,2], val = 2, 函数应该返回新的长度 5, 并且 nums 中的前五个元素为 0, 1, 3, 0, 4。
 
 你不需要考虑数组中超出新长度后面的元素。
 ```
 ## 思路
-慢指针记账，快指针发现
-a 永远等于：已经确认的非 val 的数量
-a 和 b 交换结束后，a 位置已经是有效值了，
-但我没有“确认并推进它”，于是状态就乱了
+1. 扫描过滤双指针，慢指针a记账，快指针b遍历发现
+2. a 永远等于：已经确认的非 val 的数量
+3. b进行循环，a的变化条件必须依赖于b
 ## 解法
 ```java
-class solution{
-    public int move(int[] nums,int val){
-        int a = 0,b = 0;
-        for(int i = 0;i<nums.length;i++){
-            if(nums[i]!=val){
-                a++;
-                b++;
-            }
-            return nums.length;
-        }
-        int n =nums.length;
-        while(b<nums.length){
-            if(nums[b]==val){
-                b++;
-                n--;
-            }else{
-                int emp = nums[a];
-                nums[a]=nums[b];
-                nums[b]=emp;
-                a++;
-            }
-        }
-        return n;
-    }
-}
-
-class Solution {
-    public int move(int[] nums, int val) {
-        int a = 0;
-        int b = 0;
-        int n = nums.length;
-
-        // b 用来扫描整个数组
-        while (b < n) {
-
-            // 情况 1：当前位置不是 val
-            if (nums[b] != val) {
-
-                // 只有当 a < b 时才需要交换
-                if (a < b) {
-                    int temp = nums[a];
-                    nums[a] = nums[b];
-                    nums[b] = temp;
-                }
-
-                // a 向后找下一个 val 的位置
-                a++;
-                b++;
-
-            } else {
-                // 情况 2：遇到 val，b 继续往后扫
-                b++;
-            }
-        }
-
-        // a 就是最终非 val 的数量
-        return a;
-    }
-}
-
-//b遍历数组，b遇到val，b++，a不动；b没遇到val,b++,a++，b值给a
 class Solution{
     public int move(int[] nums,int val){
         int a = 0,b = 0;
+        //b遍历数组
         for( ;b < nums.length;b++){
+            //b遇到val，b++，a不动指着不是新数组元素的位置，等b遇到不是val
             if(nums[b]!=val){
+                //b将不是val的值给a,并且由于是删除，b后面遇到不是val的都得给a
                 nums[a]=nums[b];
+                //b没遇到val,a前进
                 a++;
             }
         }
+        //a指向的是非val的下一个元素位置，从0开始正好是数组长度
         return a;
     }
 }
+```
+# 4.有序数的平方
+## 题目
+给你一个按 非递减顺序 排序的整数数组 nums，返回 每个数字的平方 组成的新数组，要求也按 非递减顺序 排序。
+```txt
+示例 1：
 
+输入：nums = [-4,-1,0,3,10]
+输出：[0,1,9,16,100]
+解释：平方后，数组变为 [16,1,0,9,100]，排序后，数组变为 [0,1,9,16,100]
+示例 2：
+
+输入：nums = [-7,-3,2,3,11]
+输出：[4,9,9,49,121]
+```
+## 思路
+1. 对撞双指针，两个指针从数组两边相向遍历
+2. 左右信息参与判断
+## 解法
+```java
 class Solution{
-    public int move(int[] nums,int val){
-        int a = 0,b = 0;
-        for( ;b < nums.length;b++){
-            //a遇到val,停下来指着它，等着b来替换掉；a没遇到val,和b一起前进
-            if(nums[a]!=val){
-                a++;
+    public int[] sque(int[] nums){
+        int[] arr = new int[nums.length];
+        int left = 0;
+        int right = nums.length - 1;
+        //psot新数组的指针
+        for(int post = nums.length-1;post >= 0;post--){
+            //两边谁大谁放在新数组的最后，然后继续比较
+            if(nums[left] * nums[left] >= nums[right] * nums[right]){
+                arr[post] = nums[left] * nums[left];
+                left++;
             }else{
-                nums[a]=nums[b];
+                arr[post] = nums[right] * nums[right];
+                right--;
             }
         }
-        return a;
+        return arr;
     }
 }
-[3, 1, 3, 2]
-第一轮  a=0,b=0进去  a是val,a,b互换 [3,1,3,2]
-第二轮  a=0,b=1进去  a是val,a,b互换 [1,3,3,2]
-第三轮  a=0,b=2进去  a不是val,a++   [1,3,3,2]
-第四轮  a=1,,b=3 进去 a是val,a,b互换  [1,2,3,3]
+```
+# 5.长度最小的子数组
+## 题目
+给定一个含有 n 个正整数的数组和一个正整数 s ，找出该数组中满足其和 ≥ s 的长度最小的 连续 子数组，并返回其长度。如果不存在符合条件的子数组，返回 0。
+```txt
+示例：
 
-[3,3,1]
+输入：s = 7, nums = [2,3,1,2,4,3]
+输出：2
+解释：子数组 [4,3] 是该条件下的长度最小的子数组。
+```
+## 思路
+1. 滑动窗口双指针  
+2. 右扩找机会，左缩保规矩
+## 解法
+```java
+class Solution{
+    public int aaa (int[] nums,int s){
+        int a = 0;
+        int sum = 0;
+        for(int b = 0;b<nums.length;b++){
+            sum = sum + nums[a] + nums[b];
+            int key = nums.length;
+            if(sum >= s){
+               key<(b+1-a)?key:(b+1-a);
+               a++;
+            }
+
+        }
+        return key;
+    }
+}
+```
+# 6.螺旋矩阵Ⅱ
+## 题目
+
+```txt
 
 ```
+## 思路
+
+## 解法
+```java
+
+```
+
+@Equalsandhashcode
