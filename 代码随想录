@@ -150,30 +150,36 @@ class Solution{
 ## 思路
 1. 滑动窗口双指针  
 2. 右扩找机会，左缩保规矩
+3. 时间复杂度O（n），for循环中动的右窗口，while中动的是左窗口，不是同一个元素被操作两次
 ## 解法
 ```java
 class Solution{
     public int aaa (int[] nums,int s){
         int a = 0;
         int sum = 0;
+        //int key = nums.length;  不能写数组长度，可能数组长度本身就是解  
+        //放最大值，有更小的就准备替换掉
+        int key = Integer.MAX_VALUE;
         for(int b = 0;b<nums.length;b++){
-            sum = sum + nums[a] + nums[b];
-            int key = nums.length;
-            if(sum >= s){
-               key<(b+1-a)?key:(b+1-a);
-               a++;
+            sum += nums[b];
+            //if(sum >= s){   不能用if，下面动的是左窗口，在一次for循环中可以动多次左窗口
+            while(sum>=s){
+               key = key<(b+1-a)?key:(b+1-a);
+               sum -= nums[a++];
             }
-
         }
-        return key;
+        return key == Integer.MAX_VALUE ? 0 : key;
     }
 }
+
 ```
 # 6.螺旋矩阵Ⅱ
 ## 题目
-
+给定一个正整数 n，生成一个包含 1 到 n^2 所有元素，且元素按顺时针顺序螺旋排列的正方形矩阵。
 ```txt
+示例:
 
+输入: 3 输出: [ [ 1, 2, 3 ], [ 8, 9, 4 ], [ 7, 6, 5 ] ]
 ```
 ## 思路
 
