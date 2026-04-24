@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>紫金红算法计算器</title>
+<style>
+body { font-family: Arial; margin: 20px; }
+input { margin: 6px 0; padding: 6px; width: 220px; }
+button { padding: 6px 14px; margin-top: 10px; }
+pre { background: #f5f5f5; padding: 12px; }
+</style>
+</head>
+<body>
+
+<h2>紫金红组合与总价计算</h2>
+
+<div>
+紫金红总数：<br>
+<input id="total" type="number">
+</div>
+
+<div>
+紫色均格（必填）：<br>
+<input id="avgPurple" type="number" step="0.01">
+</div>
+
+<div>
+金色均格（选填）：<br>
+<input id="avgGold" type="number" step="0.01">
+</div>
+
+<hr>
+
+<div>
+紫色均价：<br>
+<input id="pricePurple" type="number" step="0.01">
+</div>
+
+<div>
+金色均价：<br>
+<input id="priceGold" type="number" step="0.01">
+</div>
+
+<div>
+红色均价：<br>
+<input id="priceRed" type="number" step="0.01">
+</div>
+
+<button onclick="calc()">计算</button>
+
+<pre id="out"></pre>
+
+<script>
+function findBestSplit(total, targetAvg) {
+    let best = Infinity;
+    let results = [];
+
+    for (let a = 1; a < total; a++) {
+        let b = total - a;
+        let avg = a / b;
+        let err = Math.abs(avg - targetAvg);
+
+        if (err < best - 1e-12) {
+            best = err;
+            results = [{ a, b }];
+        } else if (Math.abs(err - best) < 1e-12) {
+            results.push({ a, b });
+        }
+    }
+    return results;
+}
+
+function calc() {
+    const T = +total.value;
+    const avgP = +avgPurple.value;
+    const avgG = +avgGold.value;
+
+    const pP = +pricePurple.value || 0;
+    const pG = +priceGold.value || 0;
+    const pR = +priceRed.value || 0;
+
+    if (!T || !avgP) {
+        alert("请填写总数和紫色均格");
+        return;
+    }
+
+    let text = "";
+
+    // 第一步：紫 / 金红
+    const purpleSplits = findBestSplit(T, avgP);
+
+    purpleSplits.forEach(s => {
+        const P = s.a;
+        const GR = s.b;
+
+        if (!avgG) {
+            const price = P * pP + GR * pR;
+            text += `紫=${P}, 金红=${GR}, 总价=${price}\n`;
+            return;
+        }
+
+        // 第二步：金 / 红
+        const goldSplits = findBestSplit(GR, avgG);
+        goldSplits.forEach(g => {
+            const G = g.a;
+            const R = g.b;
+            const price =
+                P * pP +
+                G * pG +
+                R * pR;
+            text += `紫=${P}, 金=${G}, 红=${R}, 总价=${price}\n`;
+        });
+    });
+
+    out.textContent = text;
+}
+</script>
+
+</body>
+</html>
